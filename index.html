@@ -3,12 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>교육한자 랜덤 카드</title>
+<title>교육한자 카드 v3 HTML Only</title>
 <style>
 :root{--bg:#101216;--card:#191d24;--card2:#232936;--txt:#f5f5f5;--mut:#aab2c0;--line:#343b49;--a:#8ab4ff;--g:#78d88d;--r:#ff8585}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;height:100%}
 body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Noto Sans JP",sans-serif}
 main{max-width:680px;margin:auto;padding:14px}
+body.study-mode{overflow:hidden}
+body.study-mode main{height:100dvh;padding:10px 10px calc(10px + env(safe-area-inset-bottom))}
+body.study-mode #appTitle,body.study-mode #appSub{display:none}
 h1{font-size:20px;margin:6px 0 2px}
 .sub{color:var(--mut);font-size:13px;margin-bottom:10px;line-height:1.45}
 .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px}
@@ -18,16 +22,26 @@ button:active{transform:scale(.99)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .mt{margin-top:8px}
-.card{min-height:360px;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(180deg,#202632,#171a21);border:1px solid var(--line);border-radius:22px;margin:12px 0;padding:18px}
-.kanji{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif CJK JP",serif;font-size:clamp(100px,34vw,180px);line-height:1}
+#study:not(.hide){display:flex;flex-direction:column;gap:8px;min-height:calc(100dvh - 20px);padding:10px}
+.studyTop{display:flex;align-items:center;gap:10px;flex:0 0 auto;min-height:34px}
+.homeMini{width:auto;min-width:54px;padding:8px 10px;border-radius:999px;background:transparent;color:var(--mut);font-size:13px}
+.studyStats{margin-left:auto;text-align:right;color:var(--mut);font-size:13px;line-height:1.35;white-space:nowrap}
+.studyStats .prog{color:var(--txt);font-weight:700;margin-right:10px}
+.studyStats b{color:var(--txt)}
+.card{position:relative;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(180deg,#202632,#171a21);border:1px solid var(--line);border-radius:22px;margin:0;padding:18px;overflow:hidden}
+.gradeBadge{position:absolute;top:12px;left:12px;color:var(--a);border:1px solid #405a80;background:rgba(35,41,54,.82);border-radius:999px;padding:4px 9px;font-size:13px;line-height:1;z-index:2}
+.front{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:100%}
+.kanji{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif CJK JP",serif;font-size:clamp(110px,38vw,190px);line-height:1}
 .hint,.mut{color:var(--mut);font-size:13px}
-.grade{color:var(--a);margin-bottom:8px}
-.back{text-align:left;width:100%;max-width:560px}
-.big{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif CJK JP",serif;text-align:center;font-size:72px;line-height:1;margin-bottom:10px}
-.row{border-top:1px solid var(--line);padding:9px 0;line-height:1.5}
+.hint{margin-top:16px}
+.back{text-align:left;width:100%;max-width:560px;max-height:100%;overflow:auto;padding:34px 2px 4px;-webkit-overflow-scrolling:touch}
+.big{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif CJK JP",serif;text-align:center;font-size:clamp(48px,18vw,72px);line-height:1;margin-bottom:8px}
+.row{border-top:1px solid var(--line);padding:7px 0;line-height:1.45}
 .row:first-child{border-top:0}
-.lab{display:inline-block;width:90px;color:var(--mut);font-size:14px;vertical-align:top}
-.val{font-size:17px;white-space:pre-wrap}
+.lab{display:inline-block;width:86px;color:var(--mut);font-size:14px;vertical-align:top}
+.val{font-size:clamp(15px,4vw,17px);white-space:pre-wrap}
+.answerBar{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto}
+.answerBar button{min-height:54px;font-size:17px;font-weight:700}
 .red{color:var(--r);border-color:#704040}
 .green{color:var(--g);border-color:#3d7048}
 .blue{color:var(--a);border-color:#405a80}
@@ -36,13 +50,24 @@ button:active{transform:scale(.99)}
 .wrong{border-top:1px solid var(--line);padding:8px 0}
 .small{font-size:12px;color:var(--mut);text-align:center;margin-top:10px;line-height:1.45}
 .warn{background:#2a2014;border:1px solid #6b4d24;color:#ffdca8;border-radius:12px;padding:10px;margin:10px 0;font-size:13px;line-height:1.45}
-@media(max-width:440px){.grid,.grid3{grid-template-columns:1fr}.card{min-height:340px}.lab{display:block;width:auto;margin-bottom:2px}}
+@media(max-width:440px){
+  .grid,.grid3{grid-template-columns:1fr}
+  main{padding:12px}
+  body.study-mode main{padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+  #study:not(.hide){min-height:calc(100dvh - 16px);padding:9px;gap:7px}
+  .homeMini{min-width:48px;padding:7px 9px}
+  .studyStats{font-size:12px}
+  .lab{display:block;width:auto;margin-bottom:2px}
+  .row{padding:6px 0}
+  .answerBar button{min-height:52px}
+}
 </style>
+
 </head>
 <body>
 <main>
-<h1>교육한자 랜덤 카드</h1>
-<div class="sub">저장 없음 · 닫으면 리셋 · 랜덤 50개 / 전체 1회전 / 틀린 것 다시 보기</div>
+<h1 id="appTitle">교육한자 랜덤 카드</h1>
+<div class="sub" id="appSub">저장 없음 · 닫으면 리셋 · 랜덤 50개 / 전체 1회전 / 틀린 것 다시 보기</div>
 
 <section class="box" id="setup">
 <div class="warn" id="jsWarn">버튼이 안 눌리면 파일 앱 미리보기가 아니라 Safari/Chrome에서 열어야 합니다. 이 문구가 계속 보이면 JavaScript가 실행되지 않는 상태입니다.</div>
@@ -66,10 +91,16 @@ button:active{transform:scale(.99)}
 </section>
 
 <section class="box hide" id="study">
-<div class="grid3"><div class="mut">진행 <b id="prog">0/0</b></div><div class="mut">맞음 <b id="ok">0</b></div><div class="mut">틀림 <b id="bad">0</b></div></div>
-<div class="card" id="card"><div id="front"><div class="grade" id="fg"></div><div class="kanji" id="fk"></div><div class="hint">탭해서 뒤집기</div></div><div id="back" class="back hide"></div></div>
-<div class="grid3"><button class="red" id="wrongBtn" type="button">틀림</button><button class="green" id="rightBtn" type="button">맞음</button><button class="blue" id="flipBtn" type="button">뒤집기</button></div>
-<button class="mt" id="homeBtn" type="button">처음으로</button>
+<div class="studyTop">
+<button class="homeMini" id="homeBtn" type="button">처음</button>
+<div class="studyStats"><span class="prog" id="prog">0/0</span><span>맞음 <b id="ok">0</b> · 틀림 <b id="bad">0</b></span></div>
+</div>
+<div class="card" id="card">
+<div class="gradeBadge" id="fg"></div>
+<div id="front" class="front"><div class="kanji" id="fk"></div><div class="hint">탭해서 정답 보기</div></div>
+<div id="back" class="back hide"></div>
+</div>
+<div class="answerBar"><button class="red" id="wrongBtn" type="button">몰랐음</button><button class="green" id="rightBtn" type="button">알았음</button></div>
 </section>
 
 <section class="box hide" id="done">
@@ -88,7 +119,7 @@ const $ = function(id){return document.getElementById(id);};
 function esc(s){return String(s||"").replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m] || m;});}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));let t=a[i];a[i]=a[j];a[j]=t;}return a;}
 function filtered(){let g=$("grade").value;return D.filter(function(c){return g==="all" || String(c[1])===g;});}
-function show(section){["setup","study","done"].forEach(function(id){$ (id).classList.add("hide");});$(section).classList.remove("hide");}
+function show(section){["setup","study","done"].forEach(function(id){$ (id).classList.add("hide");});$(section).classList.remove("hide");document.body.classList.toggle("study-mode",section==="study");}
 function start(list){pool=list||filtered();q=shuffle(pool);if($("mode").value==="50"&&!list)q=q.slice(0,50);seen=0;ok=0;wrong=[];show("study");next();}
 function next(){fl=false;if(!q.length){finish();return;}cur=q.shift();render();}
 function render(){
@@ -100,7 +131,6 @@ function render(){
  $("front").classList.toggle("hide",fl);
  $("back").classList.toggle("hide",!fl);
  $("back").innerHTML='<div class="big">'+esc(cur[0])+'</div>'
- +'<div class="row"><span class="lab">학년</span><span class="val">小'+esc(cur[1])+'</span></div>'
  +'<div class="row"><span class="lab">한국어 훈음</span><span class="val">'+esc(cur[2])+'</span></div>'
  +'<div class="row"><span class="lab">뜻</span><span class="val">'+esc(cur[3])+'</span></div>'
  +'<div class="row"><span class="lab">音読み</span><span class="val">'+esc(cur[4])+'</span></div>'
@@ -122,7 +152,6 @@ document.addEventListener("DOMContentLoaded", function(){
  $("card").addEventListener("click", flip);
  $("wrongBtn").addEventListener("click", function(e){answer(false,e);});
  $("rightBtn").addEventListener("click", function(e){answer(true,e);});
- $("flipBtn").addEventListener("click", flip);
  $("homeBtn").addEventListener("click", reset);
  $("homeBtn2").addEventListener("click", reset);
  $("retryBtn").addEventListener("click", retryWrong);
@@ -131,5 +160,28 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 })();
 </script>
+
+
+<script>
+/* Development HTML-only build:
+   removes old PWA service workers/caches if a previous PWA version was installed. */
+(function () {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+      registrations.forEach(function (registration) {
+        registration.unregister();
+      });
+    }).catch(function () {});
+  }
+  if ("caches" in window) {
+    caches.keys().then(function (keys) {
+      keys.forEach(function (key) {
+        if (key.indexOf("kyoiku-kanji") !== -1) caches.delete(key);
+      });
+    }).catch(function () {});
+  }
+})();
+</script>
+
 </body>
 </html>
