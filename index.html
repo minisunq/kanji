@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>교육한자 카드 v4</title>
+<title>교육한자 카드 v4.2</title>
 <style>
 :root{--bg:#101216;--card:#191d24;--card2:#232936;--txt:#f5f5f5;--mut:#aab2c0;--line:#343b49;--a:#8ab4ff;--g:#78d88d;--r:#ff8585}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -132,7 +132,6 @@ function render(){
  $("back").classList.toggle("hide",!fl);
  $("back").innerHTML='<div class="big">'+esc(cur[0])+'</div>'
  +'<div class="row"><span class="lab">한국어 훈음</span><span class="val">'+esc(cur[2])+'</span></div>'
- +'<div class="row"><span class="lab">뜻</span><span class="val">'+esc(cur[3])+'</span></div>'
  +'<div class="row"><span class="lab">音読み</span><span class="val">'+esc(cur[4])+'</span></div>'
  +'<div class="row"><span class="lab">訓読み</span><span class="val">'+esc(cur[5])+'</span></div>'
  +'<div class="row"><span class="lab">예시</span><span class="val">'+esc(cur[6])+'</span></div>';
